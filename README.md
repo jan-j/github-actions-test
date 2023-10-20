@@ -1,3 +1,3 @@
 # GitHub Actions test
 
-2
+3
