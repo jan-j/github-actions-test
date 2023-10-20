@@ -16,7 +16,7 @@ jobs:
         - name: Prepare release title
           id: release_title
           run: |
-            echo "RELEASE_TITLE='$(.github/tools/create-release-title.sh)'" >> $GITHUB_OUTPUT
+            echo "RELEASE_TITLE=$(.github/tools/create-release-title.sh)" >> $GITHUB_OUTPUT
 
         - name: Create or Update release
           run: |
