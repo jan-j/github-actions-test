@@ -15,10 +15,13 @@ jobs:
             -   name: Check for approved pull request
                 id: check_pr
                 run: |
-                    APPROVED_PR=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+                    PR_NUMBER=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
                       "https://api.github.com/repos/${{ github.repository }}/pulls?state=open&base=master&head=development" \
-                      | jq '.[] | select(.state == "APPROVED")')
-                    if [[ -n "$APPROVED_PR" ]]; then
+                      | jq '.[] | .number')
+                    IS_PR_APPROVED=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+                      "https://api.github.com/repos/${{ github.repository }}/pulls/${{ PR_NUMBER }}/reviews" \
+                      | jq 'any(select(.state == "APPROVED"))')
+                    if [ "$IS_PR_APPROVED" = true ]; then
                       echo "There is already an approved pull request from development to master. Merging into development is not allowed."
                       exit 1
                     fi
