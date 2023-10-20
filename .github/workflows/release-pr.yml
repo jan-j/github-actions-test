@@ -1,0 +1,26 @@
+name: Create or update release pull request
+concurrency: release_pr
+on:
+    push:
+        branches:
+            - "development"
+
+jobs:
+  create-or-update-release-pr:
+    runs-on: ubuntu-latest
+    steps:
+        - uses: actions/checkout@v4
+          with:
+              fetch-depth: 0
+
+        - name: Prepare release title
+          id: release_title
+          run: |
+            echo "RELEASE_TITLE=$(.github/tools/create-release-title.sh)" >> $GITHUB_OUTPUT
+
+        - name: Create or Update release
+          run: |
+            gh pr create --title "${{ steps.release_title.outputs.RELEASE_TITLE }}" --body "" --base master || \
+            gh pr edit --title "${{ steps.release_title.outputs.RELEASE_TITLE }}" --body "" --base master
+          env:
+            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
